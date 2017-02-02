@@ -20,7 +20,7 @@ RUN set -x \
 	&& docker -v
 
 RUN pip3 install docker-compose docker pytest testdocker
-RUN mkdir /repos/app
+RUN mkdir -p /repos/app
 
 COPY entrypoint /
 
