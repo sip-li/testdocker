@@ -30,6 +30,8 @@ WORKDIR /repos/app
 ENTRYPOINT ["/entrypoint"]
 CMD ["py.test"]
 
+ENV PYTEST_ADDOPTS="--verbose --showlocals"
+
 # To use:
 # docker run -ti --rm \
 #	  -e "DEPS=rabbitmq,couchdb"
