@@ -17,7 +17,6 @@ if [[ ! -z $CLONE_DEPS ]]; then
         cd - > /dev/null 2>&1
         printf '\n'
     done
-    # printf '\n'
 fi
 
 if [[ ! -z $TEST_USING ]]; then
