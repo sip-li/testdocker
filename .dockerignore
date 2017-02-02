@@ -1,0 +1,10 @@
+testdocker/
+template/
+*.md
+*.in
+*.rst
+*.txt
+*.py
+*.ini
+LICENSE
+Makefile

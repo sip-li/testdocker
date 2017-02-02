@@ -1,0 +1,26 @@
+#!/usr/bin/env ash
+
+set -e
+
+if [[ -f /repos/app/requirements.txt ]]; then
+    pip3 install -r /repos/app/requirements.txt
+fi
+
+if [[ ! -z $DEPS ]]; then
+    local org=${GITHUB_ORG:=sip-li}
+    printf "Cloning deps: ${DEPS//,/ }\n"
+    for dep in ${DEPS//,/ }; do
+        printf "$dep\n"
+        pushd ..
+        git clone https://github.com/$org/docker-${dep}
+        popd
+    done
+fi
+
+if [[ ! -z $1 ]]; then
+    set -- "$@"
+else
+    set -- py.test
+fi
+
+exec "$@"
