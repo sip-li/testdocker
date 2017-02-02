@@ -28,3 +28,6 @@ publish:
 
 build:
 	@docker build -t $(DOCKER_TAG) --force-rm .
+
+rebuild:
+	@docker build -t $(DOCKER_TAG) --force-rm --no-cache .

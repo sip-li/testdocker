@@ -35,6 +35,7 @@ setup(
     package_data={'': ['LICENSE']},
     install_requires=[
         'docker',
+        'colour_runner'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

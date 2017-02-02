@@ -2,18 +2,19 @@ import unittest
 # import configparser
 # import json
 
+import testdocker
 from testdocker import (
     DockerTestMixin,
     ContainerTestMixin,
     CurlCommand,
     NetCatCommand,
-    CatCommand
+    CatCommand,
 )
 
 
 class TestContainer(ContainerTestMixin, unittest.TestCase):
     """
-    For testing <project> container.
+    Test <project> container.
 
     Attributes:
         name:
@@ -74,3 +75,6 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
             parser.get('<section>', '<>'),
             self.container.env['<PROJECT>_VAR']
         )
+
+if __name__ == '__main__':
+    testdocker.main()

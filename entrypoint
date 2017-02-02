@@ -2,25 +2,34 @@
 
 set -e
 
-if [[ -f /repos/app/requirements.txt ]]; then
-    pip3 install -r /repos/app/requirements.txt
+printf 'Starting testdocker v%s\n\n' $TESTDOCKER_VERSION
+
+if [[ -s $REQUIREMENTS_FILE ]] && \
+    (($(wc -l $REQUIREMENTS_FILE | awk '{print $1}') > 1)); then
+    pip3 install -r $REQUIREMENTS_FILE
 fi
 
-if [[ ! -z $DEPS ]]; then
-    local org=${GITHUB_ORG:=sip-li}
-    printf "Cloning deps: ${DEPS//,/ }\n"
-    for dep in ${DEPS//,/ }; do
-        printf "$dep\n"
-        pushd ..
-        git clone https://github.com/$org/docker-${dep}
-        popd
+if [[ ! -z $CLONE_DEPS ]]; then
+    printf "Cloning deps: ${CLONE_DEPS//,/ }\n\n"
+    for dep in ${CLONE_DEPS//,/ }; do
+        cd .. > /dev/null 2>&1
+        git clone https://github.com/$GITHUB_ORG/docker-${dep}
+        cd - > /dev/null 2>&1
+        printf '\n'
     done
+    # printf '\n'
 fi
 
-if [[ ! -z $1 ]]; then
+if [[ ! -z $TEST_USING ]]; then
+    printf "Testing with: %s\n\n" "$TEST_USING"
+    if [[ $TEST_USING == 'unittest' ]]; then
+        TEST_USING='python3'
+    fi
+    set -- "$TEST_USING" "$TESTS_PATH"
+elif [[ ! -z $1 ]]; then
     set -- "$@"
 else
-    set -- py.test
+    set -- py.test "$TESTS_PATH"
 fi
 
 exec "$@"
