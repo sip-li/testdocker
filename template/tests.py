@@ -13,8 +13,7 @@ from testdocker import (
 
 
 class TestContainer(ContainerTestMixin, unittest.TestCase):
-    """
-    Test <project> container.
+    """Test <project> container.
 
     Attributes:
         name:
@@ -48,12 +47,14 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
     ]
 
     def test_correct_<>_in_<>(self):
+        """Assert correct  in """
         cmd = ''
         exit_code, output = self.container.exec(cmd)
         self.assertEqual(exit_code, 0)
         self.assertRegex(output, r'')
 
     def test_correct_<>_in_<>_json_matches_<>_in_env(self):
+        """Assert correct  in  json matches  in environment"""
         cmd = 'cat <>.ini'
         exit_code, output = self.container.exec(cmd)
         self.assertEqual(exit_code, 0)
@@ -65,6 +66,7 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
         )
 
     def test_correct_<>_in_<>_ini_matches_<>_in_env(self):
+        """Assert correct  in  matches  in environment"""
         cmd = 'cat <>.ini'
         exit_code, output = self.container.exec(cmd)
         self.assertEqual(exit_code, 0)

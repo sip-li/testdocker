@@ -47,8 +47,7 @@ class DockerTestMixin:
 
 
 class ContainerTestMixin(DockerTestMixin):
-    """
-    For testing <project> container.
+    """For testing <project> container.
 
     Attributes:
         name:
@@ -77,14 +76,14 @@ class ContainerTestMixin(DockerTestMixin):
         self.assertEqual(self.container.health, 'healthy')
 
     def test_patterns_in_logs(self):
-        """Assert 'test_patterns' appear in container logs"""
+        """Assert test_patterns appear in container logs"""
         logs = self.container.logs
         for pattern in self.test_patterns:
             with self.subTest(pattern=pattern):
                 self.assertRegex(logs, pattern)
 
     def test_tcp_ports_open(self):
-        """Assert 'test_tcp_ports' are open"""
+        """Assert test_tcp_ports are open"""
         for port in self.test_tcp_ports:
             with self.subTest(port=port):
                 cmd = commands.NetCatCommand('localhost', port)
@@ -92,7 +91,7 @@ class ContainerTestMixin(DockerTestMixin):
                 self.assertEqual(exit_code, 0)
 
     def test_udp_ports_open(self):
-        """Assert 'test_udp_ports' are open"""
+        """Assert test_udp_ports are open"""
         for port in self.test_udp_ports:
             with self.subTest(port=port):
                 cmd = commands.NetCatCommand('localhost', port, udp=True)
@@ -100,7 +99,7 @@ class ContainerTestMixin(DockerTestMixin):
                 self.assertEqual(exit_code, 0)
 
     def test_http_uris_reachable(self):
-        """Assert 'test_http_uris' are reachable"""
+        """Assert test_http_uris are reachable"""
         for uri in self.test_http_uris:
             with self.subTest(uri=uri):
                 cmd = commands.CurlCommand(uri)

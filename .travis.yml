@@ -1,11 +1,9 @@
-language: python
 services: docker
 env:
   global:
   - DOCKER_USER: callforamerica
   # DOCKER_PASS
   - secure: "v7GATy7UI8lo8LeEgPs2C22PX61A9TKxsjqINB5jogxxEHcfdLzFWAM7kkESQw+rvwlSUrMUU4396wpewBS1qV4lhqCh2UjxoTsOdnuk5HZyPGMhz/NJohTOlymK2q/5EEzwOkx0dD64cwXYIMyzg5Pd3WeFvGqK1TkzO0HbjzEviGrOmP4QrlpHLtgUTRqQETNulaCHdlZDa+NWAyqKo+rj2Xrqfg73w43wIgQHhqbriQHKJ4PQE1k5r8Zjb7UXJ04oDpN/LbdDPXAJvzJyN+J5JtnpvrXF1UHrs74yQlgYdYo7+AdA99Vkkk0gFd2zM1jo3rmpBVtQl8c2oPlFkqV2TWEkm5wx10Ee0HZuz4bF0/JxA6rupJcR8GYT5K4PeMAc7sZx7XtOditdwG0AcWmM+fXBx8ZnO+8gexqhQtTZMVatrQNk4lCrNpfdxofj4NKChIkEfDZUQDr3ruJ9vZMklC95VyCu1cdn38JQxSxjFgaIjVvYOIFFgkkAdqwtnE/BGlhaVxtbzXUheUvoL1OuR4f99dl4QJ1cwB/Ido2bEgGE9WFQw6TxyI6u7g8ui5XMBlmiaC2cHQQ4gzQPt1CnVVQpP+E6YE3MU7sVy9gZQQ4mkcac4RCCz3+JKkKj/qIRms+Bem4V2um2DM6qQN2KLMvpX9F3r4FU76x5X+8="
-
 notifications:
   email:
     on_success: never
@@ -16,19 +14,10 @@ notifications:
     on_success: always
     on_failure: always
 
-before_install:
-- export COMMIT=${TRAVIS_COMMIT::6}
-- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-- export REPO=$DOCKER_USER/testdocker
-- export TAG=$(if [[ $BRANCH == "master" ]]; then echo "latest"; else echo $BRANCH; fi)
-- 'echo "COMMIT: $COMMIT  BRANCH: $BRANCH  REPO: $REPO  TAG: $TAG"'
+before_install: source scripts/ci/environment.sh
 
-install: docker build -t $REPO:$COMMIT .
+install: docker build -t $DOCKER_IMAGE .
 
 script: true
 
-after_success:
-- docker tag $REPO:$COMMIT $REPO:$TAG
-- docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-- docker login -u $DOCKER_USER -p $DOCKER_PASS
-- docker push $REPO
+after_success: hub-push

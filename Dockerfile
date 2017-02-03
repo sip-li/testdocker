@@ -19,9 +19,9 @@ RUN set -x \
 	&& rm docker.tgz \
 	&& docker -v
 
-ENV TESTDOCKER_VERSION 0.2.2
+ENV TESTDOCKER_VERSION 0.2.3
 
-RUN pip3 install docker-compose docker pytest testdocker
+RUN pip3 install docker-compose docker pytest testdocker==$TESTDOCKER_VERSION
 RUN mkdir -p /repos/app
 
 COPY entrypoint /
@@ -30,14 +30,10 @@ VOLUME ["/repos/app"]
 WORKDIR /repos/app
 
 ENTRYPOINT ["/entrypoint"]
-CMD ["py.test"]
 
 ENV PYTEST_ADDOPTS "--verbose --showlocals"
 ENV GITHUB_ORG sip-li
 ENV CLONE_DEPS ""
-ENV TEST_USING unittest
-ENV TESTS_PATH /repos/app/tests/tests.py
-ENV REQUIREMENTS_FILE /repos/app/tests/requirements.txt
 
 # To use:
 #

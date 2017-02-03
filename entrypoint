@@ -2,12 +2,10 @@
 
 set -e
 
-printf 'Starting testdocker v%s\n\n' $TESTDOCKER_VERSION
+tests_path=${2:-/repos/app/tests/tests.py}
+base_path=$(dirname $tests_path)
 
-if [[ -s $REQUIREMENTS_FILE ]] && \
-    (($(wc -l $REQUIREMENTS_FILE | awk '{print $1}') > 1)); then
-    pip3 install -r $REQUIREMENTS_FILE
-fi
+printf 'Starting testdocker v%s\n\n' $TESTDOCKER_VERSION
 
 if [[ ! -z $CLONE_DEPS ]]; then
     printf "Cloning deps: ${CLONE_DEPS//,/ }\n\n"
@@ -19,16 +17,16 @@ if [[ ! -z $CLONE_DEPS ]]; then
     done
 fi
 
-if [[ ! -z $TEST_USING ]]; then
-    printf "Testing with: %s\n\n" "$TEST_USING"
-    if [[ $TEST_USING == 'unittest' ]]; then
-        TEST_USING='python3'
-    fi
-    set -- "$TEST_USING" "$TESTS_PATH"
-elif [[ ! -z $1 ]]; then
+if [[ -f $base_path/requirements.txt ]] && \
+    [[ $(awk NF $base_path/requirements.txt | wc -l | xargs) -gt 0 ]]; then
+        printf "Installing requirements from $base_path/requirements.txt\n"
+        pip3 install -r $base_path/requirements.txt
+fi
+
+if [[ ! -z $1 ]]; then
     set -- "$@"
 else
-    set -- py.test "$TESTS_PATH"
+    set -- "python" "$tests_path"
 fi
 
 exec "$@"
