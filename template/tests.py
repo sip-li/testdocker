@@ -4,16 +4,18 @@ import unittest
 
 import testdocker
 from testdocker import (
-    DockerTestMixin,
+    ContainerTestMixinBase,
     ContainerTestMixin,
+    CommandBase,
     CurlCommand,
     NetCatCommand,
     CatCommand,
+    Container
 )
 
 
 class TestContainer(ContainerTestMixin, unittest.TestCase):
-    """Test <project> container.
+    """Run basic tests on <project> container.
 
     Attributes:
         name:
@@ -46,6 +48,12 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
         'http://',
     ]
 
+    # sleep_interval = 8
+
+    # @classmethod
+    # def container_ready(self):
+    #     return True
+
     def test_correct_<>_in_<>(self):
         """Assert correct  in """
         cmd = ''
@@ -77,6 +85,42 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
             parser.get('<section>', '<>'),
             self.container.env['<PROJECT>_VAR']
         )
+
+
+class TestContainerExtended(ContainerTestMixinBase, unittest.TestCase):
+    """Run extended tests on <project> container."""
+
+    name = 'kazoo'
+    tear_down = False
+
+
+    def test_<>(self):
+        """Assert <> was successful."""
+        cmd = SomeCommand('arg1', 'arg2')
+        exit_code, output = self.container.exec(cmd)
+        output = output.split('\n')
+        self.assertEqual(exit_code, 0)
+        self.assertGreater(len(output), 1)
+        self.assertRegex(output[-2], r'^')
+
+    def test_<>(self):
+        """Assert <> was successful."""
+        cmd = SomeCommand('arg1', 'arg2')
+        exit_code, output = self.container.exec(cmd)
+        output = output.split('\n')
+        self.assertEqual(exit_code, 0)
+        self.assertGreater(len(output), 1)
+        self.assertRegex(output[-2], r'^')
+
+    def test_<>(self):
+        """Assert <> was successful."""
+        cmd = SomeCommand('arg1', 'arg2')
+        exit_code, output = self.container.exec(cmd)
+        output = output.split('\n')
+        self.assertEqual(exit_code, 0)
+        self.assertGreater(len(output), 1)
+        self.assertRegex(output[-2], r'^')
+
 
 if __name__ == '__main__':
     testdocker.main()

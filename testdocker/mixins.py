@@ -8,6 +8,7 @@ Unit Test mixins for testing docker containers.
 :license: Apache2.
 """
 
+import time
 import unittest
 
 from colour_runner.runner import ColourTextTestRunner
@@ -16,11 +17,19 @@ from colour_runner.result import ColourTextTestResult
 from . import objects, commands
 
 
-class ConfigurationError(Exception):
-    """"""
+class ContainerTestMixinBase:
+    """For testing <project> container.
 
+    Attributes:
+        name:
+            (str) Name for container.
+        tear_down:
+            (bool) Should ``docker-compose down`` be run in ``tearDownClass?``.
+    """
 
-class DockerTestMixin:
+    name = ''
+    tear_down = True
+
     compose = objects.Compose
 
     @classmethod
@@ -31,11 +40,16 @@ class DockerTestMixin:
         cls.container = objects.Container(cls.name)
         print('Waiting for: %s container to be ready...' % cls.container.name)
         cls.container.wait()
-        super(DockerTestMixin, cls).setUpClass()
+        if hasattr(cls, 'container_ready'):
+            sleep_interval = getattr(cls, 'sleep_interval', 8)
+            print('Waiting on container_ready hook to return True')
+            while not cls.container_ready():
+                time.sleep(sleep_interval)
+        super(ContainerTestMixinBase, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(DockerTestMixin, cls).tearDownClass()
+        super(ContainerTestMixinBase, cls).tearDownClass()
         if cls.tear_down:
             cls.compose.down()
 
@@ -46,7 +60,7 @@ class DockerTestMixin:
         )
 
 
-class ContainerTestMixin(DockerTestMixin):
+class ContainerTestMixin(ContainerTestMixinBase):
     """For testing <project> container.
 
     Attributes:

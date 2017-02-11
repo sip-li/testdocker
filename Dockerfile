@@ -19,9 +19,9 @@ RUN set -x \
 	&& rm docker.tgz \
 	&& docker -v
 
-ENV TESTDOCKER_VERSION 0.2.3
+ENV TESTDOCKER_VERSION 0.2.4
 
-RUN pip3 install docker-compose docker pytest testdocker==$TESTDOCKER_VERSION
+RUN pip3 install docker-compose docker testdocker==$TESTDOCKER_VERSION
 RUN mkdir -p /repos/app
 
 COPY entrypoint /
@@ -39,7 +39,6 @@ ENV CLONE_DEPS ""
 #
 # docker run -it --rm \
 #     -e CLONE_DEPS \
-#     -e TEST_USING \
 #     -v /var/run/docker.sock:/var/run/docker.sock \
 # 	  -v $(pwd):/repos/app \
 #     callforamerica/testdocker
