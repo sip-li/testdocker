@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 base=$(dirname $0)
+image=callforamerica/testdocker
 
 if [[ -f $base/vars.env ]]; then
     source $base/vars.env
@@ -11,10 +12,11 @@ if [[ $1 == 'local' ]]; then
     echo "Running tests locally ..."
     python3 $base/tests.py
 else
+    docker pull $image
     docker run -it --rm \
     	--env-file $base/vars.env \
         -v /var/run/docker.sock:/var/run/docker.sock \
     	-v $(pwd):/repos/app \
-        callforamerica/testdocker \
+        $image \
         python3 tests/tests.py
 fi
