@@ -8,56 +8,107 @@ Classes for interacting with docker-compose and docker.
 :license: Apache2.
 """
 
-
+import os
 import time
+import re
 import subprocess
 import docker
 
 from . import util
 
 
+COMPOSE_DEFAULT_FILES = ('docker-compose.yml', 'docker-compose.yaml')
+
+
 class Compose:
     defaults = dict(
-        up=dict(
-            daemonize=True
+        globals=dict(
+            options=dict(
+                files=COMPOSE_DEFAULT_FILES
+            ),
+            flags=[],
         ),
-        down=dict(
-            volumes=True
-        )
+        up=['daemonize', 'no_build'],
+        down=['volumes']
     )
 
-    @classmethod
-    def up(cls, options=None):
-        options = util.set_defaults(options or {}, cls.defaults['up'])
-        cls.execute('up', options)
+    def __init__(self, options=None, flags=None):
+        self.options = util.set_defaults(
+            options or {}, self.defaults['globals']['options'])
+        self.flags = util.set_defaults(
+            flags or [], self.defaults['globals']['flags'])
+        self._discover_compose_files()
 
-    @classmethod
-    def down(cls, options=None):
-        options = util.set_defaults(options or {}, cls.defaults['down'])
-        cls.execute('down', options)
+    def _discover_compose_files(self):
+        self.options['files'] = [file for file in
+                                 util.filter_dupes(self.options['files'])
+                                 if os.path.exists(file)]
 
-    @staticmethod
-    def _build_args(command, options):
+    def _build_global_args(self):
+        args = []
+        for key in self.options:
+            if key == 'files':
+                files = self.options[key]
+                args.extend(['--file {}'.format(file) for file in files])
+            elif key == 'project_name':
+                args.append('--project-name {}'.format(self.options[key]))
+        for flag in self.flags:
+            args.append(util.format_flag(flag))
+        return args
+
+    def _build_command_args(self, command, flags=None):
+        flags = util.set_defaults(flags or [], self.defaults[command])
         args = []
         if command == 'up':
-            if options.get('daemonize'):
-                args.append('-d')
+            for flag in flags:
+                if flag == 'daemonize':
+                    args.append('-d')
+                else:
+                    args.append(util.format_flag(flag))
         elif command == 'down':
-            if options.get('volumes'):
-                args.append('-v')
-        return ' '.join(args)
+            for flag in flags:
+                args.append(util.format_flag(flag))
+        return list(util.filter_dupes(args))
 
-    @classmethod
-    def execute(cls, command, options):
-        args = cls._build_args(command, options)
-        cls.shell('docker-compose %s %s' % (command, args))
+    def _build_args_for(self, command, flags=None):
+        flags = flags or []
+        args = {}
+        args['globals'] = self._build_global_args()
+        args[command] = self._build_command_args(command, flags)
+        return args
+
+    def _build_command(self, command, args):
+        return 'docker-compose {} {} {}'.format(
+            ' '.join(args['globals']), command, ' '.join(args[command])
+        )
+
+    def up(self, options=None, flags=None):
+        args = self._build_args_for('up', flags)
+        exit_code, output = self.execute('up', args)
+        if exit_code != 0:
+            raise Exception(output)
+        print_results('up', output)
+        return self._parse_containers(output)
+
+    def down(self, options=None, flags=None):
+        args = self._build_args_for('down', flags)
+        return self.execute('down', args, test_success=True)
+
+    def execute(self, command, args=None, test_success=False):
+        command = self._build_command(command, args)
+        return self.shell(command, test_success)
 
     @staticmethod
-    def shell(command, return_code=False):
-        code, output = subprocess.getstatusoutput(command)
-        if return_code:
-            return code == 0
-        return output
+    def shell(command, test_success=False):
+        exit_code, output = subprocess.getstatusoutput(command)
+        if test_success:
+            return exit_code == 0
+        return exit_code, output
+
+    @staticmethod
+    def _parse_containers(output):
+        names = extract_container_names(output)
+        return [Container(name) for name in names]
 
 
 class Container:
@@ -131,4 +182,15 @@ class Container:
         return exit_code, output
 
 
+def print_results(command, output):
+    print('\nContainers {}:\n{}\n'.format(command, output.strip()))
+
+def extract_container_names(output):
+    pattern = re.compile(
+        r'^(?:Creating )?(.+?)(?:is up-to-date)?$', re.MULTILINE)
+    filtered = util.filter_lines(output, r'^Creating network')
+    return [match.group(1).strip() for match in pattern.finditer(filtered)]
+
+
 # container = Container('kazoo')
+# compose = Compose(options=dict(files=['docker-compose.yaml']))

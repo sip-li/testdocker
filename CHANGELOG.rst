@@ -1,7 +1,16 @@
 KubeWait Changelog
 ~~~~~~~~~~~~~~~~~~
 
-0.2.0
+0.2.5
+-----
+
+Feb 11, 2016
+* Compose object now allows multiple compose files to be passed
+* Mixin now waits for all containers
+* Optimizations for speed
+
+
+0.2.1
 -----
 
 Feb 11, 2016

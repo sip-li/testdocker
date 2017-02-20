@@ -6,7 +6,7 @@ Unit Testing for docker containers.
 """
 
 __title__ = 'testdocker'
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 __build__ = 0x000204
 __author__ = "Joe Black <joeblack949@gmail.com>"
 __license__ = 'Apache 2.0'

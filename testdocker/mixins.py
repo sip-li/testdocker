@@ -14,7 +14,7 @@ import unittest
 from colour_runner.runner import ColourTextTestRunner
 from colour_runner.result import ColourTextTestResult
 
-from . import objects, commands
+from . import util, objects, commands
 
 
 class ContainerTestMixinBase:
@@ -23,23 +23,30 @@ class ContainerTestMixinBase:
     Attributes:
         name:
             (str) Name for container.
+        compose_files:
+            (list) List of docker-compose files to load for testing.
         tear_down:
             (bool) Should ``docker-compose down`` be run in ``tearDownClass?``.
     """
 
     name = ''
+    compose_files = []
     tear_down = True
-
-    compose = objects.Compose
 
     @classmethod
     def setUpClass(cls):
         if not hasattr(cls, 'name'):
             raise ConfigurationError('Test class missing name attribute')
-        cls.compose.up()
-        cls.container = objects.Container(cls.name)
-        print('Waiting for: %s container to be ready...' % cls.container.name)
-        cls.container.wait()
+        compose_files = getattr(cls, 'compose_files')
+        cls.compose = objects.Compose(options=dict(files=compose_files))
+        cls.containers = cls.compose.up()
+        if not all(c.health == 'healthy' for c in cls.containers):
+            print('Waiting for: %s to be ready...' % cls.containers)
+            for container in cls.containers:
+                container.wait()
+        cls.container = util.select_one(
+            cls.containers, where='name', equals=cls.name)
+
         if hasattr(cls, 'container_ready'):
             sleep_interval = getattr(cls, 'sleep_interval', 8)
             print('Waiting on container_ready hook to return True')
@@ -52,6 +59,9 @@ class ContainerTestMixinBase:
         super(ContainerTestMixinBase, cls).tearDownClass()
         if cls.tear_down:
             cls.compose.down()
+        del cls.containers
+        del cls.container
+        del cls.compose
 
     def defaultTestResult(self):
         return ColourTextTestResult(
@@ -66,6 +76,8 @@ class ContainerTestMixin(ContainerTestMixinBase):
     Attributes:
         name:
             (str) Name for container.
+        compose_files:
+            (list) List of docker-compose files to load for testing.
         tear_down:
             (bool) Should ``docker-compose down`` be run in ``tearDownClass?``.
         test_patterns:
@@ -79,6 +91,7 @@ class ContainerTestMixin(ContainerTestMixinBase):
     """
 
     name = ''
+    compose_files = []
     tear_down = True
     test_patterns = []
     test_tcp_ports = []

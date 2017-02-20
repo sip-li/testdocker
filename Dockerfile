@@ -19,9 +19,9 @@ RUN set -x \
 	&& rm docker.tgz \
 	&& docker -v
 
-ENV TESTDOCKER_VERSION 0.2.4
+ENV TESTDOCKER_VERSION 0.2.5
 
-RUN pip3 install docker-compose docker testdocker==$TESTDOCKER_VERSION
+RUN pip3 install --upgrade docker-compose docker testdocker==$TESTDOCKER_VERSION
 RUN mkdir -p /repos/app
 
 COPY entrypoint /
@@ -33,7 +33,7 @@ ENTRYPOINT ["/entrypoint"]
 
 ENV PYTEST_ADDOPTS "--verbose --showlocals"
 ENV GITHUB_ORG sip-li
-ENV CLONE_DEPS ""
+# ENV CLONE_DEPS ""
 
 # To use:
 #

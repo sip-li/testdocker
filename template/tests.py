@@ -22,6 +22,8 @@ class TestContainer(ContainerTestMixin, unittest.TestCase):
             (str) Name for container.
         tear_down:
             (bool) Should ``docker-compose down`` be run in ``tearDownClass?``.
+        compose_files:
+            (list) List of docker-compose files to load for testing.
         test_patterns:
             (list) Regex patterns to assert in  container logs.
         test_tcp_ports:
