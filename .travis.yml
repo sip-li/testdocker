@@ -1,7 +1,7 @@
 services: docker
 env:
   global:
-  - DOCKER_USER: callforamerica
+  - DOCKER_USER=callforamerica
   # DOCKER_PASS
   - secure: "Hs15h7s7JYAKqlv+Tv3YfsKHwaa2oYKqlOFQ6JNaOn68/71TDunRTq6q6an/i6j9pvF6LeLSSqnfEPWqsF9dmf8XHbzKrdM0VqhKzL6T/o1f4Y69NSm60ZqBiHN/y9sFUVW9lBMwada6Y3Cnt2lTSP/Ko9l1W9am7mIMiD/833gvKBHJuj6SLuI2ZTvYtsdxWRfX0S7Wv02KvhGZZlbiQG99XQDDPF/jx2T5yebKXxYlPTiApGq+KM3C26wTjW4ctC18P1i7OhwiYMnsn+hHAQAo7l2vCYvXdASbOSqleVFkrONEiQd4YfSDz9J86rAkSji/N8UIoF9geVfeVtiLFmVntk/5z7Hy7lVpTX/M+6KQK3rAGlkW39bK57f88S/EvNdnoefl33SXWmGv4MIpTXuXqquZ0/C3iY1fp/HdKV6bIRT1GNfDb5Be/7gUfxKse6CCNjxwcjzel3pOJ0+PUVV2gHQilIdGOtDHNzXai49ONnGTly6/U79ZrbqhCoGKtXN/gXWlRZlsvOYZQ3d/SZ9h56bk4wVfnxBV7e2iLVKrtAMHkvUJiFxhkelyIfbyLGQw8VASA4dGeQEYfi4NhZRV8QE+TJemziXXdSDopFB3DeW+tsOce9TD+WexYEqjaLtsfOoRkiV+OC7p5WGT3AcZzotUt8xwFaXPUE4wigI="
 notifications:
@@ -20,4 +20,6 @@ install: docker build -t $DOCKER_IMAGE .
 
 script: true
 
-after_success: hub-push
+after_success:
+- ci-tag-build
+- hub-push
