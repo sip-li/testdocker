@@ -1,6 +1,4 @@
 import unittest
-# import configparser
-# import json
 
 import testdocker
 from testdocker import (

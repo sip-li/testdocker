@@ -1,10 +1,10 @@
 """
 testdocker.mixins
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 Unit Test mixins for testing docker containers.
 
-:copyright: (c) 2016 by Joe Black.
+:copyright: (c) 2017 by Joe Black.
 :license: Apache2.
 """
 
@@ -36,7 +36,7 @@ class ContainerTestMixinBase:
     @classmethod
     def setUpClass(cls):
         if not hasattr(cls, 'name'):
-            raise ConfigurationError('Test class missing name attribute')
+            raise RuntimeError('Test class missing name attribute')
         compose_files = getattr(cls, 'compose_files')
         cls.compose = objects.Compose(options=dict(files=compose_files))
         cls.containers = cls.compose.up()
@@ -135,6 +135,7 @@ class ContainerTestMixin(ContainerTestMixinBase):
 
 
 def main():
+    """Execute the tests"""
     unittest.main(
         testRunner=ColourTextTestRunner(verbosity=2, descriptions=True),
         verbosity=2,

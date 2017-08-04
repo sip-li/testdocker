@@ -31,12 +31,18 @@ setup(
         'https://github.com/joeblackwaslike/%s/tarball/%s' % (name, version)),
     license='Apache 2.0',
     zip_safe=False,
+    include_package_data=True,
     packages=find_packages(),
     package_data={'': ['LICENSE']},
     install_requires=[
+        'requests',
+        'PyYAML',
         'docker',
-        'colour_runner'
+        'colour_runner',
     ],
+    entry_points=dict(
+        console_scripts=['testdocker=testdocker.cli.main:main']
+    ),
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

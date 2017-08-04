@@ -1,54 +1,67 @@
 """
 testdocker.commands
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Commands classes for docker testing.
 
-:copyright: (c) 2016 by Joe Black.
+:copyright: (c) 2017 by Joe Black.
 :license: Apache2.
 """
+
+import os
+import json
 
 from . import util
 
 
 class CommandBase:
-    def __str__(self):
+    cmd = ''
+    def __repr__(self):
         return self.cmd
+
 
 class CurlCommand(CommandBase):
     defaults = dict(
         options=dict(
             silent=True,
-            fail=True
+            fail=True,
+            location=True
         )
     )
-    def __init__(self, url, method='GET', headers=None, data=None,
-                 options=None, **kwargs):
+    def __init__(self, url, method='GET', headers=None, data=None, file=None,
+                 options=None):
         headers = headers or {}
         data = data or {}
         options = util.set_defaults(options or {}, self.defaults['options'])
 
         cmd = ['curl']
-        cmd.append(self.build_args(options))
+        cmd.append(self._build_args(options))
         if method != 'GET':
-            cmd.append('-X %s' % method)
-        if headers:
-            for header in headers:
-                cmd.append("-H '%s: %s'" % header)
+            cmd.append('-X %s' % method.upper())
         if data:
             if isinstance(data, dict):
                 data = json.dumps(data)
             cmd.append("--data '%s'" % data)
+        if file:
+            if not os.path.isfile(file):
+                raise FileNotFoundError(file)
+            cmd.append("--data-binary @%s" % file)
+            headers['Content-type'] = util.get_content_type(file)
+        if headers:
+            for key, val in headers.items():
+                cmd.append("-H '%s: %s'" % (key, val))
         cmd.append(url)
         self.cmd = ' '.join(cmd)
 
     @staticmethod
-    def build_args(options):
+    def _build_args(options):
         args = []
         if options.get('silent'):
             args.append('-s')
         if options.get('fail'):
             args.append('-f')
+        if options.get('location'):
+            args.append('-L')
         return ' '.join(args)
 
 

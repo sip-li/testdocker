@@ -1,30 +1,31 @@
 """
 testdocker.objects
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Classes for interacting with docker-compose and docker.
 
-:copyright: (c) 2016 by Joe Black.
+:copyright: (c) 2017 by Joe Black.
 :license: Apache2.
 """
 
 import os
 import time
-import re
-import subprocess
+
 import docker
+from requests.exceptions import HTTPError
+import yaml
 
 from . import util
 
 
-COMPOSE_DEFAULT_FILES = ('docker-compose.yml', 'docker-compose.yaml')
-
-
 class Compose:
+    """A Class for interacting with the `docker-compose` cli command."""
+
+    DEFAULT_FILES = ('docker-compose.yml', 'docker-compose.yaml')
     defaults = dict(
         globals=dict(
             options=dict(
-                files=COMPOSE_DEFAULT_FILES
+                files=DEFAULT_FILES
             ),
             flags=[],
         ),
@@ -77,46 +78,61 @@ class Compose:
         args[command] = self._build_command_args(command, flags)
         return args
 
-    def _build_command(self, command, args):
+    @staticmethod
+    def _build_command(command, args):
         return 'docker-compose {} {} {}'.format(
             ' '.join(args['globals']), command, ' '.join(args[command])
         )
 
-    def up(self, options=None, flags=None):
+    def up(self, flags=None):
+        """Equivalent to docker-compose up <flags>"""
         args = self._build_args_for('up', flags)
-        exit_code, output = self.execute('up', args)
+        exit_code, output = self._execute('up', args)
         if exit_code != 0:
-            raise Exception(output)
-        print_results('up', output)
-        return self._parse_containers(output)
+            raise RuntimeError('%s: %s', exit_code, output)
+        return self._parse_containers(self.options['files'])
 
-    def down(self, options=None, flags=None):
+    def down(self, flags=None):
+        """Equivalent to docker-compose down <flags>"""
         args = self._build_args_for('down', flags)
-        return self.execute('down', args, test_success=True)
+        return self._execute('down', args, test_success=True)
 
-    def execute(self, command, args=None, test_success=False):
+    def _execute(self, command, args=None, test_success=False):
         command = self._build_command(command, args)
-        return self.shell(command, test_success)
+        return util.shell(command, test_success)
 
     @staticmethod
-    def shell(command, test_success=False):
-        exit_code, output = subprocess.getstatusoutput(command)
-        if test_success:
-            return exit_code == 0
-        return exit_code, output
+    def _parse_services(files):
+        services = []
+        for cfile in files:
+            with open(cfile) as fd:
+                cf = yaml.safe_load(fd)
+            services.extend(cf['services'].keys())
+        return list(set(services))
 
-    @staticmethod
-    def _parse_containers(output):
-        names = extract_container_names(output)
-        return [Container(name) for name in names]
+    def _parse_containers(self, files):
+        services = self._parse_services(files)
+        return [Container(name) for name in services]
 
 
 class Container:
-    def __init__(self, name, client=None, delay=8):
+    """A proxy object representing a docker container."""
+    def __init__(self, name, client=None, delay=10):
         self.client = client or docker.from_env()
         self.name = name
         self.delay = delay
-        self.obj = self.client.containers.get(name)
+        self.obj = self._load_container(name)
+
+    def _load_container(self, name):
+        tries = 0
+        while True:
+            try:
+                return self.client.containers.get(name)
+            except HTTPError:
+                if tries > 10:
+                    raise RuntimeError('Container still not ready')
+                tries += 1
+                time.sleep(tries)
 
     def __repr__(self):
         return '%s(%s)' % (
@@ -126,48 +142,59 @@ class Container:
 
     @property
     def network(self):
+        """Exposes the docker network name as an object attribute."""
         network = self.inspect['HostConfig']['NetworkMode']
         return self.inspect['NetworkSettings']['Networks'][network]
 
     @property
     def ip(self):
+        """Exposes the container ip address as an object attribute."""
         return self.network['IPAddress']
 
     @property
     def hostnames(self):
+        """Exposes the hostnames of the container as an object attribute."""
         return self.network['Aliases']
 
     @property
     def env(self):
+        """Exposes the container environment as a dict object attribute."""
         return dict(
             [item.split('=') for item in self.inspect['Config']['Env']])
 
     @property
     def inspect(self):
+        """Exposes a dictionary similar to running `docker inspect <name>`."""
         return self.obj.attrs
 
     def reload(self):
+        """Reload the container object using the docker api."""
         self.obj.reload()
 
     @property
     def health(self):
+        """Exposes the health of the container as an object attribute."""
         return self.obj.attrs['State']['Health']['Status']
 
     @property
     def is_healthy(self):
+        """Exposes whether the container status is healthy as a boolean."""
         return self.health == 'healthy'
 
     def wait(self):
+        """Block until container passes health check."""
         while not self.is_healthy:
             time.sleep(self.delay)
             self.reload()
 
     @property
     def logs(self):
+        """Exposes the container logs as an object attribute."""
         return self.obj.logs().decode().strip()
 
     def exec(self, cmd, test_success=False, output_only=False,
              exit_code_only=False):
+        """Executes a command inside the container"""
         if not isinstance(cmd, str):
             cmd = str(cmd)
         exec_id = self.client.api.exec_create(self.name, cmd).get('Id')
@@ -180,17 +207,3 @@ class Container:
         if exit_code_only:
             return exit_code
         return exit_code, output
-
-
-def print_results(command, output):
-    print('\nContainers {}:\n{}\n'.format(command, output.strip()))
-
-def extract_container_names(output):
-    pattern = re.compile(
-        r'^(?:Creating )?(.+?)(?:is up-to-date)?$', re.MULTILINE)
-    filtered = util.filter_lines(output, r'^Creating network')
-    return [match.group(1).strip() for match in pattern.finditer(filtered)]
-
-
-# container = Container('kazoo')
-# compose = Compose(options=dict(files=['docker-compose.yaml']))
