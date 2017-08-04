@@ -33,6 +33,6 @@ def clean(ctx):
     ctx.run("rm -rf build dist *.egg-info")
 
 
-@task(build, register, upload, clean)
+@task(build, upload, clean)
 def publish(ctx):
     pass

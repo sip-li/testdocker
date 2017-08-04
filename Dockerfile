@@ -3,8 +3,9 @@ FROM python:3-alpine
 RUN apk add --no-cache \
 		ca-certificates \
 		curl \
+		git \
 		openssl \
-		git
+		tar
 
 ENV DOCKER_CHANNEL stable
 ENV DOCKER_VERSION 17.06.0-ce
@@ -29,12 +30,3 @@ ENTRYPOINT ["/entrypoint"]
 
 ENV PYTEST_ADDOPTS "--verbose --showlocals"
 ENV GITHUB_ORG sip-li
-# ENV CLONE_DEPS ""
-
-# To use:
-#
-# docker run -it --rm \
-#     -e CLONE_DEPS \
-#     -v /var/run/docker.sock:/var/run/docker.sock \
-# 	  -v $(pwd):/repos/app \
-#     callforamerica/testdocker
