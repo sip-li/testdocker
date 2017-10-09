@@ -1,5 +1,7 @@
 FROM python:3-alpine
 
+MAINTAINER Joe Black <me@joeblack.nyc>
+
 RUN apk add --no-cache \
 		ca-certificates \
 		curl \
@@ -16,10 +18,12 @@ RUN set -x \
 	&& tar -xzvf docker.tgz --strip-components 1 --directory /usr/local/bin/ \
 	&& docker -v && dockerd -v
 
+RUN mkdir -p /repos/app
+
 ENV TESTDOCKER_VERSION 0.2.6
 
-RUN pip3 install --upgrade docker-compose docker testdocker==$TESTDOCKER_VERSION
-RUN mkdir -p /repos/app
+RUN pip3 install --upgrade docker-compose docker
+RUN pip3 install testdocker==$TESTDOCKER_VERSION
 
 COPY entrypoint /
 
@@ -29,4 +33,4 @@ WORKDIR /repos/app
 ENTRYPOINT ["/entrypoint"]
 
 ENV PYTEST_ADDOPTS "--verbose --showlocals"
-ENV GITHUB_ORG sip-li
+ENV GITHUB_ORG telephoneorg

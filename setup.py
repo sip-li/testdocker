@@ -25,10 +25,10 @@ setup(
     long_description=long_description,
     keywords=['docker', 'docker-compose', 'testing'],
     author='Joe Black',
-    author_email='joeblack949@gmail.com',
-    url='https://github.com/joeblackwaslike/%s' % name,
+    author_email='me@joeblack.nyc',
+    url='https://github.com/telephoneorg/%s' % name,
     download_url=(
-        'https://github.com/joeblackwaslike/%s/tarball/%s' % (name, version)),
+        'https://github.com/telephoneorg/%s/tarball/%s' % (name, version)),
     license='Apache 2.0',
     zip_safe=False,
     include_package_data=True,

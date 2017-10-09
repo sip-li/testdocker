@@ -1,26 +1,40 @@
+addons:
+  apt:
+    packages:
+    - realpath
 language: python
+python:
+- "3.6"
 services: docker
 env:
   global:
-  - DOCKER_USER=callforamerica
+  - GITHUB_USER=joeblackwaslike
+  - GITHUB_ORG=telephoneorg
+  - DOCKER_USER=joeblackwaslike
+  - DOCKER_ORG=telephoneorg
   # DOCKER_PASS
-  - secure: "NWTMKWc/BYCXz5NQo9uavmzbSco9nU1nPDBg+kyByXLpYCalaDLWQK4NQOWrTfCvXRGvEqOk/5JACsSdo8ei3nkX5nc2RumwLCXnEcFZf8GIPAL/xwVr+qOha9J2GMEAjJ44MXvSvuh108vQaGrAsiNoKO2iHM53ZsV0aAOVRBQkgqhSl1ap+q+shPw+lQJ3CTVGmv9RGjUp4ERwI1l9ZE566Xa4ODwk7esIimvYqB8M64HyiRk/Mm173ZWYDdXIo11+HmbCf1Fld4iyAn0CJMiKcxjMh0euJU943I3qwcS21TNrBaLSvnxK+gSxyzKOLVaDZPhQqCDbUAuNpbvy9shByQfpXoU8eBz8IZRzH2Im4FJM2q0qSGi0uGL7L8TDaRIU4a1s0mHOU+XGhlYxVTg2e82fwbsN38nvNkN0Vyc3ayfEGdHHpNm/jOtzBn+9a+wwkG7zjiMghzue5x+GIuQIHO9OxVucPf1ijkHYp++ZjmklstOP/ma7gxbQVjf29YLVR+2vy7IjFbz0vorbZAMRSeijoORo79Gv0w1fKFt+lUhvnXwA/1ao3I8u1hp1rLqFDK4slcaIiNriDv5gOblaTgtkzo2RxcELZxE1uhxNZNfQ9FMga0SF6+fsD6Ro7Rvsv6mdGmYAJQUm5dvpTZ0C+SK4spkek266fzU4leE="
+  - secure: "uoKkrXS3GJprdJUIwhQhoE+o3NzTTZLnRI0zwnVC1SUxf/kPxhnD30+g9bkKUspRuUVXfrIdcuSzYGqVwHBuLaDyHWF9Uov1jTjMS2i9hvkbida/DPJLnfMyhwMPnkcfZElhh7/oUHAtkDvhk2qfb/ehB9UpSbK2irBVfmD4mKVZXVSfpclrAHvVzyaS1emN7unwY8uPqxvRO+u6F7Bn37njArIb0JXQay2oHZAP5wWld/LzNWic5LK8dVKjgLnR1r78vW0zwcq4HKzDf3hWte0IM25dDvtwZI6zecgls+KehD4/BX+/5g6P0qQC16XHnu+iq224uNIEB6nKuWB6ErqvNzw8NdnIWCKInd3xk8YuPTRmASiTA6kUT8Nwr6DLjNZbIZNaUCcgYLrLW+qVsReh+d2Hd0qRvPXQTn7SPxT81YqCN6bJY0zbG4dzOEOZDBawe9wt5rHO+ZAeuvVsvd2/PVllqeLrEA2nq2mHHnamyONkjRIpspz7YdBfe/6noOb1HYx/Mpr7iPsesUP+fSD7br9CZgAW6Lc6TeJ5rQIRX69vAlbueEdiZSI0VThHmu4PulqEkoIYIFOhvlUyZfM2riCCTHW02MLQOXrFaU1J5yCGOxKHOxZmAE1xNjtapj25ocbWZFiKMxOcHmYmwpgpfaKvTCEIlMeU81Qy8pk="
 notifications:
   email:
     on_success: never
     on_failure: always
   slack:
     rooms:
-    - secure: "21z2YTUBZyeA1Bf54TdOMNp/z102FqD2CLAyjQZK4piTZT11vcFTOgKKbnzzNLO09mgfNmnkPJQSLuNXqQgxjBS8+osYBSQnMxve8gigDiTnhIjZ8tTZM+g1A5CI07AYCUo7GSOH3X78lD8fdu/NMakh+GB9o/AgH2iCvlZhOWnQ8efh+XJIG6TQTAp0d0bM5WNXWRGad8rPiqwHGmsRF3lwAFzhjHYmTqELmDCX0+LBXRv4FnZf3x1n4C6QpTNY0W7eCqixOP5n+PS36oYskPlQFT0i2Ei8Sc8MUYRb7CWn0pqkbkc/bVRtBu3CnksXCefR5e/lFB90Y+mirSsxVVvU2eacKtLo/lZPZZraiqwZqC9oEpktZex1OrEYl/MjYYRnO5q/+zCQnfsxRw4H8RVd7xwM1zIG2cwRgg8WBDMeCEN1JmFOGxigHwY+2dQjotshnQDpeKoW+k/N8LjHcZcgyAeIb+roTn/R4LKwh9wwABY/6SdZaaidkO4buf3R9aEy4R51VlxLKYD8+VkpuUBaY/cEzXsVEBrxkXswoSgoMESh1GmGuQ0oQorXVGEQdmFJnTAFxTd0cP98hqC7luH7umwDYRT4GAul6Xo1qGI+XYcjRYwM92Oy1v8LA671t9tq5RkfheK9y7mL950zUHsXG/X497kve2ip5fC8ihI="
+    - secure: "uM2l8ZYMLRPvZtCZZu4HSuHIsjMmMIpjMNWu5v9UlmJM9eFW1DcJBFPQ/fLBtup4NvGcnBEA3yJYsXHNGIZIq7RmTAprWjTvR2GB0qMp0exyBd7lZfoOCzooVH7b0UaMVl6c/EvrZWN11bgVh3eTjHXFSJ7/4Y2wiaWxD6l+iFKYxDbnJ1Aa0tVS+R3/4on0aONvrzpJ5BJP340Y5xdidwi1pZHMKOOhsht7LannYTXIvAmoSzhtDfcOPI2t+ifArq9bO/4JlDo/pad7IZzrBsp5IgfEcE9MYbyJOPsFAeLwI1Ls3YX5+R4HlnPf6cWP7f7u1Br2xksD6JRcPk2Goqtx0vaJzJDOE90fgWb8dY6N/ZmIIMDMFnkZnMxIm2Eu4tKJCNOF6zz8hUacLfrRpccTbsL8c44X1RRqoLxPfIR9Cbs8wEiPrgFZpin4Bfw2lqdVXxIDwdq6OHHF2oy/buufu3DW5oiWEllh0XlfqKl6VuXCKfJwFCHanhuxebUorWn+EtdovjsJMHiPM+AdkmMmdp94yD4M8gNI9ZKW9OYM4AtN9pPVHH0+AyTtIg1LXpneb53b3AhdxD59/EFe2D5YOn2/Rmmzx5uTcShOMgY7vSJvJzIvyaLjYgeWlkGQ1sW1PXxqVkAF9dCvXw9QSDnSHITC0AyRJO5VXnQsRC0="
     on_success: always
     on_failure: always
 
-before_install: source scripts/ci/environment.sh
+before_install:
+- source scripts/ci/environment.sh
+- pip install invoke
 
-install: docker build -t $DOCKER_IMAGE .
+install:
+- pip install -e .
 
 script: true
 
 after_success:
+- inv docker.build
 - ci-tag-build
 - hub-push
+- hub-update-readme

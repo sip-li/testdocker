@@ -1,9 +1,9 @@
 testdocker
 ~~~~~~~~~~
 
-Maintainer: Joe Black <joeblack949@gmail.com>
+Maintainer: Joe Black <me@joeblack.nyc>
 
-Repository: https://www.github.com/joeblackwaslike/testdocker
+Repository: https://www.github.com/telephoneorg/testdocker
 
 Description
 -----------
@@ -32,7 +32,7 @@ Docker Usage:
 
   docker run -it --rm \
       -v $(pwd):/repos/app \
-      callforamerica/testdocker \
+      telephoneorg/testdocker \
       testdocker init
 
 * Modify class attributes in `tests/tests.py` according to the directions in

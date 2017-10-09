@@ -17,6 +17,10 @@ ns.configure(dict(
     pwd=os.getcwd(),
     docker=dict(
         user=os.getenv('DOCKER_USER'),
-        tag='%s/%s:latest' % (os.getenv('DOCKER_USER'), 'testdocker')
+        org=os.getenv('DOCKER_ORG', os.getenv('DOCKER_USER', 'telephoneorg')),
+        tag='%s/%s:latest' % (
+            os.getenv('DOCKER_ORG', os.getenv('DOCKER_USER', 'telephoneorg')),
+            'testdocker'
+        )
     )
 ))
